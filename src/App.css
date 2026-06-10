@@ -1,0 +1,156 @@
+body {
+  background: #e9ebf1;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.page {
+  width: 100vw;
+  height: 100vh;
+  background: #e9ebf1;
+}
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #e9ebf1;
+}
+
+.decor {
+  position: absolute;
+  top: 48px;
+  left: 52px;
+  width: 56px;
+}
+
+.left {
+  position: absolute;
+  left: 52px;
+  top: 328px;
+  z-index: 2;
+}
+
+.title {
+  width: 690px;
+  display: block;
+}
+
+.caseButton {
+  display: block;
+  margin-top: 38px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.caseButton img {
+  width: 500px;
+  display: block;
+}
+
+.logoBlock {
+  position: absolute;
+  right: 40px;
+  top: 46px;
+  width: 820px;
+  z-index: 1;
+}
+
+.contacts {
+  position: absolute;
+  left: 52px;
+  bottom: 48px;
+  z-index: 2;
+}
+
+.contactIcons {
+  width: 240px;
+  height: auto;
+  display: block;
+}
+
+.legal {
+  position: absolute;
+  left: 52px;
+  bottom: 22px;
+  margin: 0;
+  color: #6c7282;
+  font-size: 14px;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .hero {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    padding: 32px 20px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .decor {
+    position: static;
+    width: 56px;
+    margin-bottom: 28px;
+  }
+
+  .logoBlock {
+    position: static;
+    width: 100%;
+    order: 1;
+    margin: 0 auto 32px;
+  }
+
+  .left {
+    position: static;
+    order: 2;
+    z-index: 2;
+  }
+
+  .title {
+    width: 100%;
+  }
+
+  .caseButton {
+    margin-top: 28px;
+  }
+
+  .caseButton img {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .contacts {
+    position: static;
+    order: 3;
+    margin-top: 48px;
+  }
+
+  .contactIcons {
+    width: 220px;
+  }
+
+  .legal {
+    position: static;
+    order: 4;
+    margin-top: 16px;
+    font-size: 9px;
+    line-height: 1.3;
+  }
+}
