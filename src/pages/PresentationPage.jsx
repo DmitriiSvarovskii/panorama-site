@@ -142,7 +142,7 @@ function PresentationPage() {
 
                 <a
                     className="saveButton"
-                    href="/presentation/presentation.pdf"
+                    href="/files/presentation.pdf"
                     download
                 >
                     <img src={saveButton} alt="Скачать" />
