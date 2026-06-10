@@ -23,11 +23,21 @@ function PresentationPage() {
 
     }
     const openFullscreen = () => {
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+        if (isIOS) {
+            window.open(slides[currentSlide], '_blank')
+            return
+        }
+
         const element = document.querySelector('.slideBox')
 
         if (element?.requestFullscreen) {
             element.requestFullscreen()
+            return
         }
+
+        window.open(slides[currentSlide], '_blank')
     }
     const handleTouchStart = (event) => {
 
