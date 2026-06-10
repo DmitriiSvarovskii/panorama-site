@@ -21,6 +21,34 @@
 
 }
 
+.fullscreenButton {
+
+    position: absolute;
+
+    top: 16px;
+
+    right: 16px;
+
+    z-index: 5;
+
+    width: 42px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(233, 235, 241, 0.85);
+
+    color: #253593;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+}
+
 .slideBox {
 
     position: relative;
@@ -195,5 +223,13 @@
         width: 100%;
         max-width: 320px;
         display: block;
+    }
+
+    .fullscreenButton {
+
+        top: 12px;
+
+        right: 12px;
+
     }
 }

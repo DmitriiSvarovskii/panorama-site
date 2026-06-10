@@ -22,6 +22,13 @@ function PresentationPage() {
         setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
 
     }
+    const openFullscreen = () => {
+        const element = document.querySelector('.slideBox')
+
+        if (element?.requestFullscreen) {
+            element.requestFullscreen()
+        }
+    }
     const handleTouchStart = (event) => {
 
         setTouchStart(event.changedTouches[0].screenX)
@@ -102,14 +109,17 @@ function PresentationPage() {
         <main className="presentationPage">
             <section className="presentationWrapper">
                 <div
-
                     className="slideBox"
-
                     onTouchStart={handleTouchStart}
-
                     onTouchEnd={handleTouchEnd}
-
                 >
+                    <button
+                        className="fullscreenButton"
+                        onClick={openFullscreen}
+                    >
+                        ⛶
+                    </button>
+
                     <button className="arrow arrowLeft" onClick={prevSlide}>
                         ‹
                     </button>
