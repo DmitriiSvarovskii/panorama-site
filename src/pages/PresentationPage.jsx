@@ -10,7 +10,7 @@ const slides = Array.from({ length: 42 }, (_, index) => {
 function PresentationPage() {
 
     const [currentSlide, setCurrentSlide] = useState(0)
-
+    const [touchStart, setTouchStart] = useState(0)
     const nextSlide = () => {
 
         setCurrentSlide((prev) => (prev + 1) % slides.length)
@@ -22,7 +22,31 @@ function PresentationPage() {
         setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
 
     }
+    const handleTouchStart = (event) => {
 
+        setTouchStart(event.changedTouches[0].screenX)
+
+    }
+
+    const handleTouchEnd = (event) => {
+
+        const touchEnd = event.changedTouches[0].screenX
+
+        const distance = touchStart - touchEnd
+
+        if (distance > 50) {
+
+            nextSlide()
+
+        }
+
+        if (distance < -50) {
+
+            prevSlide()
+
+        }
+
+    }
     useEffect(() => {
 
         const preloadIndexes = [
@@ -77,7 +101,15 @@ function PresentationPage() {
     return (
         <main className="presentationPage">
             <section className="presentationWrapper">
-                <div className="slideBox">
+                <div
+
+                    className="slideBox"
+
+                    onTouchStart={handleTouchStart}
+
+                    onTouchEnd={handleTouchEnd}
+
+                >
                     <button className="arrow arrowLeft" onClick={prevSlide}>
                         ‹
                     </button>
@@ -97,9 +129,13 @@ function PresentationPage() {
                     </div>
                 </div>
 
-                <button className="saveButton">
+                <a
+                    className="saveButton"
+                    href="/presentation/presentation.pdf"
+                    download
+                >
                     <img src={saveButton} alt="Скачать" />
-                </button>
+                </a>
             </section>
         </main>
     )

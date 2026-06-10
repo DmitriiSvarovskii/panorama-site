@@ -6,7 +6,8 @@ import logoBlock from '../assets/logoblock.png'
 import elementOne from '../assets/element-1.png'
 import titleBlock from '../assets/title.png'
 import buttonCase from '../assets/button-case.png'
-import tgMail from '../assets/tg-mail.png'
+import tgIcon from '../assets/tg.svg'
+import mailIcon from '../assets/mail.svg'
 
 function HomePage() {
     return (
@@ -25,7 +26,21 @@ function HomePage() {
                 <img className="logoBlock" src={logoBlock} alt="Panorama" />
 
                 <div className="contacts">
-                    <img className="contactIcons" src={tgMail} alt="На связи" />
+                    <a
+                        href="https://t.me/marriapanova"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <img className="contactIcon" src={tgIcon} alt="Telegram" />
+                    </a>
+
+                    <a href="mailto:info@panorama360.ru">
+                        <img className="contactIcon" src={mailIcon} alt="Email" />
+                    </a>
+
+                    <span className="contactsText">
+                        на связи
+                    </span>
                 </div>
 
                 <p className="legal">
