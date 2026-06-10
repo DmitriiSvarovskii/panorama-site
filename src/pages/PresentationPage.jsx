@@ -11,6 +11,7 @@ function PresentationPage() {
 
     const [currentSlide, setCurrentSlide] = useState(0)
     const [touchStart, setTouchStart] = useState(0)
+    const [isFullscreen, setIsFullscreen] = useState(false)
     const nextSlide = () => {
 
         setCurrentSlide((prev) => (prev + 1) % slides.length)
@@ -23,21 +24,11 @@ function PresentationPage() {
 
     }
     const openFullscreen = () => {
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        setIsFullscreen(true)
+    }
 
-        if (isIOS) {
-            window.open(slides[currentSlide], '_blank')
-            return
-        }
-
-        const element = document.querySelector('.slideBox')
-
-        if (element?.requestFullscreen) {
-            element.requestFullscreen()
-            return
-        }
-
-        window.open(slides[currentSlide], '_blank')
+    const closeFullscreen = () => {
+        setIsFullscreen(false)
     }
     const handleTouchStart = (event) => {
 
@@ -157,6 +148,35 @@ function PresentationPage() {
                     <img src={saveButton} alt="Скачать" />
                 </a>
             </section>
+            {isFullscreen && (
+                <div
+                    className="fullscreenOverlay"
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                >
+                    <button className="closeFullscreenButton" onClick={closeFullscreen}>
+                        ×
+                    </button>
+
+                    <button className="arrow arrowLeft" onClick={prevSlide}>
+                        ‹
+                    </button>
+
+                    <img
+                        className="fullscreenSlideImage"
+                        src={slides[currentSlide]}
+                        alt={`Слайд ${currentSlide + 1}`}
+                    />
+
+                    <button className="arrow arrowRight" onClick={nextSlide}>
+                        ›
+                    </button>
+
+                    <div className="slideCounter fullscreenCounter">
+                        {currentSlide + 1} / {slides.length}
+                    </div>
+                </div>
+            )}
         </main>
     )
 }

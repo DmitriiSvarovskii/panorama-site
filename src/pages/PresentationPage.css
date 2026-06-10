@@ -216,3 +216,44 @@
         right: 12px;
     }
 }
+
+.fullscreenOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #18213d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.fullscreenSlideImage {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+    display: block;
+}
+
+.closeFullscreenButton {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 10000;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(233, 235, 241, 0.85);
+    color: #253593;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.fullscreenCounter {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 10000;
+}
