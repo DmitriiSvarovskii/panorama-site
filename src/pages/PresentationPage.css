@@ -6,94 +6,30 @@
 }
 
 .presentationWrapper {
-
     width: 100%;
-
     min-height: 100vh;
-
     padding: 42px 52px 32px;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
-}
-
-.fullscreenButton {
-
-    position: absolute;
-
-    top: 16px;
-
-    right: 16px;
-
-    z-index: 5;
-
-    width: 42px;
-
-    height: 42px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    background: rgba(233, 235, 241, 0.85);
-
-    color: #253593;
-
-    font-size: 22px;
-
-    cursor: pointer;
-
 }
 
 .slideBox {
-
     position: relative;
-
     width: 100%;
-
     height: calc(100vh - 230px);
-
     min-height: 560px;
-
-    background: #18213d;
-
-    overflow: hidden;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-}
-
-/* .presentationWrapper {
-    width: 100%;
-    min-height: 100vh;
-    padding: 44px 52px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.slideBox {
-    position: relative;
-    width: 100%;
-    height: calc(100vh - 220px);
     background: #18213d;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-} */
+}
 
 .slideImage {
-    width: auto;
+    width: 100%;
     height: 100%;
+    object-fit: contain;
     display: block;
 }
 
@@ -131,9 +67,23 @@
     z-index: 3;
 }
 
-/* .saveButton {
-    display: inline-block;
-    margin-top: 40px;
+.fullscreenButton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(233, 235, 241, 0.85);
+    color: #253593;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.saveButton {
+    margin-top: 34px;
     padding: 0;
     border: none;
     background: transparent;
@@ -142,33 +92,13 @@
 }
 
 .saveButton img {
-    width: 560px;
-    display: block;
-} */
-.saveButton {
-
-    margin-top: 34px;
-
-    padding: 0;
-
-    border: none;
-
-    background: transparent;
-
-    cursor: pointer;
-
-}
-
-.saveButton img {
-
     width: 500px;
-
     display: block;
-
 }
+
+/* Мобильная версия */
 
 @media (max-width: 768px) {
-
     .presentationPage {
         width: 100%;
         min-height: 100vh;
@@ -179,12 +109,15 @@
     .presentationWrapper {
         min-height: 100vh;
         padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .slideBox {
         width: 100%;
-        height: calc(100vh - 150px);
-        min-height: 500px;
+        height: calc(100vh - 180px);
+        min-height: 600px;
         overflow: hidden;
     }
 
@@ -211,12 +144,12 @@
 
     .slideCounter {
         right: 12px;
-        bottom: 8px;
-        font-size: 12px;
+        bottom: 12px;
+        font-size: 14px;
     }
 
     .saveButton {
-        margin-top: 16px;
+        margin-top: 24px;
     }
 
     .saveButton img {
@@ -226,10 +159,60 @@
     }
 
     .fullscreenButton {
-
         top: 12px;
-
         right: 12px;
+        width: 42px;
+        height: 42px;
+        font-size: 22px;
+    }
+}
 
+/* Горизонтальный режим телефона */
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .presentationPage {
+        background: #18213d;
+        overflow: hidden;
+    }
+
+    .presentationWrapper {
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .slideBox {
+        width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        background: #18213d;
+    }
+
+    .slideImage {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .saveButton {
+        display: none;
+    }
+
+    .arrowLeft {
+        left: 12px;
+    }
+
+    .arrowRight {
+        right: 12px;
+    }
+
+    .slideCounter {
+        right: 16px;
+        bottom: 12px;
+        font-size: 14px;
+    }
+
+    .fullscreenButton {
+        top: 12px;
+        right: 12px;
     }
 }
