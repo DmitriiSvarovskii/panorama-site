@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react'
 import saveButton from '../assets/save-button.png'
 
 import './PresentationPage.css'
+const SLIDES_VERSION = '20260611'
 
 const slides = Array.from({ length: 44 }, (_, index) => {
-    return `/slides-webp/slide-${index + 1}.webp`
+
+    return `/slides-webp/slide-${index + 1}.webp?v=${SLIDES_VERSION}`
+
 })
 
 function PresentationPage() {
