@@ -3,7 +3,7 @@ import saveButton from '../assets/save-button.png'
 
 import './PresentationPage.css'
 
-const slides = Array.from({ length: 42 }, (_, index) => {
+const slides = Array.from({ length: 44 }, (_, index) => {
     return `/slides-webp/slide-${index + 1}.webp`
 })
 
