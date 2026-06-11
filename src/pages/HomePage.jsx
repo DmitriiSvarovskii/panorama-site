@@ -13,7 +13,7 @@ function HomePage() {
     return (
         <main className="page">
             <section className="hero">
-                <img className="decor" src={elementOne} alt="" />
+                {/* <img className="decor" src={elementOne} alt="" /> */}
 
                 <div className="left">
                     <img className="title" src={titleBlock} alt="Креативное агентство спецпроектов" />
