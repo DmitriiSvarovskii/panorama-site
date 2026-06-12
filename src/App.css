@@ -640,7 +640,8 @@ body {
   .hero {
     --mobile-pad: 24px;
     --logo-size: min(calc(100vw - var(--mobile-pad) * 2), 520px);
-    --button-width: min(calc(100vw - var(--mobile-pad) * 2), 572px);
+    --button-width: min(76vw, 572px);
+    /* --button-width: min(calc(100vw - var(--mobile-pad) * 2), 572px); */
 
     min-height: 100dvh;
     padding: 28px var(--mobile-pad) 24px;
@@ -710,7 +711,7 @@ body {
 
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: clamp(42px, 11.2vw, 58px);
+    font-size: clamp(40px, 11.2vw, 58px);
     line-height: 1.08;
     letter-spacing: 0;
 
@@ -722,7 +723,7 @@ body {
 
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
-    font-size: clamp(26px, 6.6vw, 34px);
+    font-size: clamp(24px, 6.6vw, 34px);
     line-height: 1.15;
     letter-spacing: 0;
 
@@ -734,14 +735,12 @@ body {
 
   .caseButton,
   .saveButton {
-    width: var(--button-width);
-    height: clamp(86px, 24vw, 138px);
-    min-height: 86px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
 
-    margin-top: 45px;
-
-    font-size: clamp(24px, 6.2vw, 36px);
-    line-height: 1;
+    box-shadow:
+      inset 0 8px 24px rgba(180, 188, 235, 0.8),
+      inset 0 -8px 20px rgba(255, 255, 255, 0.9),
+      0 12px 20px rgba(70, 85, 160, 0.25);
   }
 
   .contacts {
@@ -760,12 +759,12 @@ body {
   }
 
   .contactIcon {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
   }
 
   .contactsText {
-    font-size: 28px;
+    font-size: 20px;
     line-height: 1;
   }
 
