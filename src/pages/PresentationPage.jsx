@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import saveButton from '../assets/save-button.png'
 
 import './PresentationPage.css'
 const SLIDES_VERSION = '20260611'
@@ -148,7 +147,7 @@ function PresentationPage() {
                     href="/files/presentation.pdf"
                     download
                 >
-                    <img src={saveButton} alt="Скачать" />
+                    Скачать
                 </a>
             </section>
             {isFullscreen && (

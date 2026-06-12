@@ -83,17 +83,109 @@
 }
 
 .saveButton {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(31.25vw, 572px);
+    height: min(7.55vw, 138px);
+    min-height: 74px;
     margin-top: 34px;
-    padding: 0;
-    border: none;
+    border: 0;
+    border-radius: 105px;
     background: transparent;
+    color: #26358c;
     cursor: pointer;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(25px, 2.05vw, 40px);
+    font-weight: 500;
+    line-height: 26px;
+    letter-spacing: 0;
+    text-align: center;
     text-decoration: none;
+    text-transform: lowercase;
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.saveButton img {
-    width: 500px;
-    display: block;
+.saveButton::before,
+.saveButton::after {
+    position: absolute;
+    border-radius: 105px;
+    content: "";
+    pointer-events: none;
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+.saveButton::before {
+    inset: 0 1px 7px 0;
+    z-index: -2;
+    background: rgba(255, 255, 255, 0);
+    box-shadow:
+        inset 12px 14px 24px rgba(36, 44, 78, 0.34),
+        inset -16px -14px 22px rgba(255, 255, 255, 0.82),
+        0 12px 12px rgba(38, 53, 140, 0.32);
+}
+
+.saveButton::after {
+    inset: 7px 1px 0 1px;
+    z-index: -1;
+    border: 0;
+    background: rgba(233, 235, 241, 0.08);
+    box-shadow:
+        inset 7px 9px 17px rgba(38, 53, 140, 0.18),
+        inset -10px -10px 18px rgba(255, 255, 255, 0.72);
+    filter: blur(0);
+}
+
+.saveButton:hover,
+.saveButton:focus-visible {
+    color: #26358c;
+}
+
+.saveButton:hover::before,
+.saveButton:focus-visible::before {
+    box-shadow:
+        inset 12px 14px 24px rgba(29, 35, 65, 0.42),
+        inset -16px -14px 22px rgba(255, 255, 255, 0.58),
+        0 12px 13px rgba(38, 53, 140, 0.42);
+}
+
+.saveButton:hover::after,
+.saveButton:focus-visible::after {
+    background: rgba(151, 156, 174, 0.34);
+    box-shadow:
+        inset 7px 9px 17px rgba(38, 53, 140, 0.28),
+        inset -10px -10px 18px rgba(255, 255, 255, 0.38);
+}
+
+.saveButton:focus-visible {
+    outline: 3px solid rgba(38, 53, 140, 0.35);
+    outline-offset: 6px;
+}
+
+.saveButton:active {
+    color: #e51e2d;
+    transform: translateY(2px);
+}
+
+.saveButton:active::before {
+    box-shadow:
+        inset 12px 14px 24px rgba(229, 30, 45, 0.24),
+        inset -16px -14px 22px rgba(255, 255, 255, 0.62),
+        0 10px 13px rgba(229, 30, 45, 0.45);
+}
+
+.saveButton:active::after {
+    background: rgba(229, 30, 45, 0.08);
+    box-shadow:
+        inset 7px 9px 17px rgba(229, 30, 45, 0.22),
+        inset -10px -10px 18px rgba(255, 255, 255, 0.48);
 }
 
 /* Мобильная версия */
@@ -149,13 +241,27 @@
     }
 
     .saveButton {
+        width: min(77vw, 290px);
+        height: 70px;
+        min-height: 70px;
         margin-top: 24px;
+        font-size: 20px;
+        line-height: 1;
     }
 
-    .saveButton img {
-        width: 100%;
-        max-width: 320px;
-        display: block;
+    .saveButton::before {
+        inset: 0 1px 4px 0;
+        box-shadow:
+            inset 6px 8px 14px rgba(36, 44, 78, 0.34),
+            inset -8px -8px 14px rgba(255, 255, 255, 0.82),
+            0 9px 10px rgba(38, 53, 140, 0.32);
+    }
+
+    .saveButton::after {
+        inset: 4px 1px 0 1px;
+        box-shadow:
+            inset 4px 5px 10px rgba(38, 53, 140, 0.18),
+            inset -6px -6px 10px rgba(255, 255, 255, 0.72);
     }
 
     .fullscreenButton {

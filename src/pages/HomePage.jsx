@@ -2,10 +2,7 @@ import { Link } from 'react-router-dom'
 
 import '../App.css'
 
-import logoBlock from '../assets/logoblock.png'
-import elementOne from '../assets/element-1.png'
-import titleBlock from '../assets/title.png'
-import buttonCase from '../assets/button-case.png'
+import panoramaLogo from '../assets/panorama-logo.svg'
 import tgIcon from '../assets/tg.svg'
 import mailIcon from '../assets/mail.svg'
 
@@ -13,17 +10,50 @@ function HomePage() {
     return (
         <main className="page">
             <section className="hero">
-                {/* <img className="decor" src={elementOne} alt="" /> */}
+
 
                 <div className="left">
-                    <img className="title" src={titleBlock} alt="Креативное агентство спецпроектов" />
+                    <div className="title">
+                        <h1
+                            className="heroTitle"
+                            aria-label="Креативное агентство спецпроектов"
+                        >
+                            <span className="titleDesktop">
+                                Креативное агентство<br />
+                                спецпроектов<span className="heroEmoji" aria-hidden="true">✌🏻</span>
+                            </span>
+
+                            <span className="titleMobile" aria-hidden="true">
+                                Креативное<br />
+                                агентство<span className="heroEmoji">✌🏻</span><br />
+                                спецпроектов
+                            </span>
+                        </h1>
+
+                        <p
+                            className="heroSubtitle"
+                            aria-label="придумываем производим запускаем"
+                        >
+                            <span className="subtitleDesktop">
+                                придумываем | производим | запускаем
+                            </span>
+
+                            <span className="subtitleMobile" aria-hidden="true">
+                                придумываем |<br />
+                                производим | запускаем
+                            </span>
+                        </p>
+                    </div>
 
                     <Link to="/presentation" className="caseButton">
-                        <img src={buttonCase} alt="Смотреть презентацию" />
+                        смотреть кейсы
                     </Link>
                 </div>
 
-                <img className="logoBlock" src={logoBlock} alt="Panorama" />
+                <div className="logoBlock" role="img" aria-label="Panorama">
+                    <span className="logoEllipse" aria-hidden="true" />
+                    <img className="logoText" src={panoramaLogo} alt="" />
+                </div>
 
                 <div className="contacts">
                     <a
