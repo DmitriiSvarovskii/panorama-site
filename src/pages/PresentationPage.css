@@ -429,3 +429,50 @@
     top: 50%;
     z-index: 10000;
 }
+
+.diagnosticPanel {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 10001;
+    width: min(520px, calc(100vw - 32px));
+    max-height: min(360px, calc(100vh - 32px));
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(24, 33, 61, 0.92);
+    color: #e9ebf1;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 18px 48px rgba(12, 18, 36, 0.32);
+}
+
+.diagnosticHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.diagnosticHeader button {
+    flex: 0 0 auto;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: #e9ebf1;
+    color: #253593;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.diagnosticPanel pre {
+    max-height: 280px;
+    margin: 0;
+    overflow: auto;
+    white-space: pre-wrap;
+    color: #e9ebf1;
+    font-size: 11px;
+    line-height: 1.45;
+}

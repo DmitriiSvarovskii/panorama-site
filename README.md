@@ -56,6 +56,18 @@ ls dist
 
 ## Настройка Nginx
 
+### Формат диагностического лога
+
+```bash
+nano /etc/nginx/conf.d/panorama-client-log.conf
+```
+
+```nginx
+log_format panorama_client '$time_iso8601 ip=$remote_addr host=$host '
+                           'status=$status method=$request_method uri="$request_uri" '
+                           'rt=$request_time referer="$http_referer" ua="$http_user_agent"';
+```
+
 ```bash
 nano /etc/nginx/sites-available/panorama
 ```
@@ -87,7 +99,35 @@ server {
         add_header Cache-Control "public, max-age=86400";
         try_files $uri =404;
     }
+
+    location = /client-log {
+        access_log /var/log/nginx/panorama-client.log panorama_client;
+        add_header Cache-Control "no-store";
+        return 204;
+    }
 }
+```
+
+### Ротация диагностического лога
+
+```bash
+nano /etc/logrotate.d/panorama-client
+```
+
+```text
+/var/log/nginx/panorama-client.log {
+    hourly
+    rotate 2
+    missingok
+    notifempty
+    copytruncate
+}
+```
+
+Если `logrotate` на сервере запускается только раз в день, добавьте почасовой запуск:
+
+```bash
+(crontab -l 2>/dev/null; echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/panorama-client") | crontab -
 ```
 
 ```bash

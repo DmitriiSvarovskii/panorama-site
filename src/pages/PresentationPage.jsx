@@ -9,9 +9,183 @@ const slides = Array.from({ length: 44 }, (_, index) => {
 
 })
 
+const DIAGNOSTIC_STORAGE_KEY = 'panoramaPresentationDiagnostics'
+const DIAGNOSTIC_SESSION_KEY = 'panoramaPresentationSession'
+const DIAGNOSTIC_RETENTION_MS = 2 * 60 * 60 * 1000
+const DIAGNOSTIC_MAX_EVENTS = 240
+const SLOW_SLIDE_LOAD_MS = 3000
 const slideLoadCache = new Map()
 
 const normalizeSlideIndex = (index) => (index + slides.length) % slides.length
+
+const getSlideNumberFromSrc = (src) => {
+
+    const match = src.match(/slide-(\d+)\.webp/)
+
+    return match ? Number(match[1]) : null
+
+}
+
+const getDiagnosticSession = () => {
+
+    if (typeof window === 'undefined') {
+
+        return 'server'
+
+    }
+
+    try {
+
+        const existingSession = window.sessionStorage.getItem(DIAGNOSTIC_SESSION_KEY)
+
+        if (existingSession) {
+
+            return existingSession
+
+        }
+
+        const nextSession = window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
+
+        window.sessionStorage.setItem(DIAGNOSTIC_SESSION_KEY, nextSession)
+
+        return nextSession
+
+    } catch {
+
+        return 'unavailable'
+
+    }
+
+}
+
+const getConnectionInfo = () => {
+
+    if (typeof navigator === 'undefined') {
+
+        return {}
+
+    }
+
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
+
+    if (!connection) {
+
+        return {}
+
+    }
+
+    return {
+        effectiveType: connection.effectiveType,
+        downlink: connection.downlink,
+        rtt: connection.rtt,
+        saveData: connection.saveData,
+    }
+
+}
+
+const readDiagnosticEvents = () => {
+
+    if (typeof window === 'undefined') {
+
+        return []
+
+    }
+
+    try {
+
+        const events = JSON.parse(window.localStorage.getItem(DIAGNOSTIC_STORAGE_KEY) || '[]')
+        const cutoff = Date.now() - DIAGNOSTIC_RETENTION_MS
+
+        return events
+            .filter((event) => Date.parse(event.time) >= cutoff)
+            .slice(-DIAGNOSTIC_MAX_EVENTS)
+
+    } catch {
+
+        return []
+
+    }
+
+}
+
+const getDebugMode = () => {
+
+    if (typeof window === 'undefined') {
+
+        return false
+
+    }
+
+    return new URLSearchParams(window.location.search).get('debug') === '1'
+
+}
+
+const sendDiagnosticBeacon = (entry) => {
+
+    if (typeof window === 'undefined') {
+
+        return
+
+    }
+
+    const params = new URLSearchParams()
+
+    Object.entries(entry).forEach(([key, value]) => {
+
+        if (value !== undefined && value !== null && value !== '') {
+
+            params.set(key, String(value))
+
+        }
+
+    })
+
+    window.fetch(`/client-log?${params.toString()}`, {
+        cache: 'no-store',
+        keepalive: true,
+    }).catch(() => undefined)
+
+}
+
+const logPresentationEvent = (event, details = {}, options = {}) => {
+
+    if (typeof window === 'undefined') {
+
+        return
+
+    }
+
+    const entry = {
+        time: new Date().toISOString(),
+        event,
+        session: getDiagnosticSession(),
+        version: SLIDES_VERSION,
+        online: navigator.onLine,
+        path: window.location.pathname,
+        ...getConnectionInfo(),
+        ...details,
+    }
+
+    try {
+
+        const events = [...readDiagnosticEvents(), entry].slice(-DIAGNOSTIC_MAX_EVENTS)
+
+        window.localStorage.setItem(DIAGNOSTIC_STORAGE_KEY, JSON.stringify(events))
+        window.dispatchEvent(new CustomEvent('presentationDiagnostic', { detail: entry }))
+
+    } catch {
+
+        // Diagnostics should never break the presentation.
+
+    }
+
+    if (options.sendToServer) {
+
+        sendDiagnosticBeacon(entry)
+
+    }
+
+}
 
 const preloadSlide = (src) => {
 
@@ -28,6 +202,23 @@ const preloadSlide = (src) => {
         return cachedSlide
 
     }
+
+    const slideNumber = getSlideNumberFromSrc(src)
+    const startTime = window.performance?.now?.() ?? Date.now()
+    const slowLoadTimer = window.setTimeout(() => {
+
+        logPresentationEvent('slide_load_slow', {
+            slide: slideNumber,
+            duration: Math.round((window.performance?.now?.() ?? Date.now()) - startTime),
+            src,
+        }, { sendToServer: true })
+
+    }, SLOW_SLIDE_LOAD_MS)
+
+    logPresentationEvent('slide_load_start', {
+        slide: slideNumber,
+        src,
+    })
 
     const slidePromise = new Promise((resolve, reject) => {
 
@@ -49,11 +240,27 @@ const preloadSlide = (src) => {
 
             }
 
+            window.clearTimeout(slowLoadTimer)
+
+            logPresentationEvent('slide_load_success', {
+                slide: slideNumber,
+                duration: Math.round((window.performance?.now?.() ?? Date.now()) - startTime),
+                src,
+            })
+
             resolve(src)
 
         }
 
         img.onerror = () => {
+
+            window.clearTimeout(slowLoadTimer)
+
+            logPresentationEvent('slide_load_error', {
+                slide: slideNumber,
+                duration: Math.round((window.performance?.now?.() ?? Date.now()) - startTime),
+                src,
+            }, { sendToServer: true })
 
             reject(new Error(`Не удалось загрузить ${src}`))
 
@@ -91,6 +298,8 @@ function PresentationPage() {
     const [pendingSlide, setPendingSlide] = useState(null)
     const [touchStart, setTouchStart] = useState(0)
     const [isFullscreen, setIsFullscreen] = useState(false)
+    const [isDebugMode] = useState(getDebugMode)
+    const [diagnosticEvents, setDiagnosticEvents] = useState(readDiagnosticEvents)
     const navigationRequestRef = useRef(0)
 
     const goToSlide = useCallback((index) => {
@@ -110,6 +319,11 @@ function PresentationPage() {
 
         setPendingSlide(targetSlide)
 
+        logPresentationEvent('slide_navigation', {
+            fromSlide: currentSlide + 1,
+            toSlide: targetSlide + 1,
+        })
+
         preloadSlide(slides[targetSlide])
             .then(() => {
 
@@ -117,6 +331,10 @@ function PresentationPage() {
 
                     setCurrentSlide(targetSlide)
                     setPendingSlide(null)
+
+                    logPresentationEvent('slide_displayed', {
+                        slide: targetSlide + 1,
+                    })
 
                 }
 
@@ -127,6 +345,10 @@ function PresentationPage() {
 
                     setCurrentSlide(targetSlide)
                     setPendingSlide(null)
+
+                    logPresentationEvent('slide_display_after_error', {
+                        slide: targetSlide + 1,
+                    }, { sendToServer: true })
 
                 }
 
@@ -153,6 +375,14 @@ function PresentationPage() {
     const closeFullscreen = () => {
         setIsFullscreen(false)
     }
+
+    const copyDiagnosticEvents = () => {
+
+        navigator.clipboard?.writeText(JSON.stringify(readDiagnosticEvents(), null, 2))
+            .catch(() => undefined)
+
+    }
+
     const handleTouchStart = (event) => {
 
         setTouchStart(event.changedTouches[0].screenX)
@@ -178,6 +408,57 @@ function PresentationPage() {
         }
 
     }
+
+    useEffect(() => {
+
+        logPresentationEvent('presentation_open', {
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            debug: isDebugMode,
+        }, { sendToServer: true })
+
+        const updateDiagnostics = () => {
+
+            setDiagnosticEvents(readDiagnosticEvents())
+
+        }
+
+        const handleOnline = () => {
+
+            logPresentationEvent('browser_online', {}, { sendToServer: true })
+
+        }
+
+        const handleOffline = () => {
+
+            logPresentationEvent('browser_offline', {}, { sendToServer: true })
+
+        }
+
+        if (isDebugMode) {
+
+            window.addEventListener('presentationDiagnostic', updateDiagnostics)
+
+        }
+
+        window.addEventListener('online', handleOnline)
+        window.addEventListener('offline', handleOffline)
+
+        return () => {
+
+            if (isDebugMode) {
+
+                window.removeEventListener('presentationDiagnostic', updateDiagnostics)
+
+            }
+
+            window.removeEventListener('online', handleOnline)
+            window.removeEventListener('offline', handleOffline)
+
+        }
+
+    }, [isDebugMode])
+
     useEffect(() => {
 
         preloadIndexes([
@@ -367,6 +648,22 @@ function PresentationPage() {
                         {currentSlide + 1} / {slides.length}
                     </div>
                 </div>
+            )}
+
+            {isDebugMode && (
+                <aside className="diagnosticPanel">
+                    <div className="diagnosticHeader">
+                        <span>Диагностика</span>
+                        <button type="button" onClick={copyDiagnosticEvents}>
+                            Скопировать
+                        </button>
+                    </div>
+                    <pre>
+                        {diagnosticEvents.slice(-24).map((event) => (
+                            `${event.time} ${event.event} slide=${event.slide ?? event.toSlide ?? ''} duration=${event.duration ?? ''} online=${event.online}\n`
+                        ))}
+                    </pre>
+                </aside>
             )}
         </main>
     )
