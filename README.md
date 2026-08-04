@@ -189,9 +189,3 @@ npm run build
 
 systemctl reload nginx
 ```
-
-### Или вручную
-
-```bash
-scp -r dist/* root@IP:/var/www/panorama-site/panorama-site/dist/
-```
