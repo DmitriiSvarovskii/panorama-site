@@ -35,17 +35,9 @@ mkdir -p /var/www/panorama-site
 
 cd /var/www/panorama-site
 
-git clone <REPOSITORY>
+git clone https://github.com/DmitriiSvarovskii/panorama-site.git
 
 cd panorama-site
-```
-
-### Или вручную
-
-```bash
-scp -r . root@IP:/var/www/panorama-site/
-
-cd /var/www/panorama-site/panorama-site
 ```
 
 ---
