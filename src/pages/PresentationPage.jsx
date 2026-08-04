@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import './PresentationPage.css'
-const SLIDES_VERSION = '20260612'
+const SLIDES_VERSION = '20260613'
 
 const slides = Array.from({ length: 44 }, (_, index) => {
 
