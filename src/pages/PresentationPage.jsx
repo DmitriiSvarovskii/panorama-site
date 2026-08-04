@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import './PresentationPage.css'
-const SLIDES_VERSION = '20260611'
+const SLIDES_VERSION = '20260612'
 
 const slides = Array.from({ length: 44 }, (_, index) => {
 
@@ -9,22 +9,143 @@ const slides = Array.from({ length: 44 }, (_, index) => {
 
 })
 
+const slideLoadCache = new Map()
+
+const normalizeSlideIndex = (index) => (index + slides.length) % slides.length
+
+const preloadSlide = (src) => {
+
+    if (typeof window === 'undefined') {
+
+        return Promise.resolve()
+
+    }
+
+    const cachedSlide = slideLoadCache.get(src)
+
+    if (cachedSlide) {
+
+        return cachedSlide
+
+    }
+
+    const slidePromise = new Promise((resolve, reject) => {
+
+        const img = new Image()
+
+        img.onload = async () => {
+
+            try {
+
+                if (img.decode) {
+
+                    await img.decode()
+
+                }
+
+            } catch {
+
+                // The image is already loaded; decoding can still fail in older browsers.
+
+            }
+
+            resolve(src)
+
+        }
+
+        img.onerror = () => {
+
+            reject(new Error(`Не удалось загрузить ${src}`))
+
+        }
+
+        img.src = src
+
+    }).catch((error) => {
+
+        slideLoadCache.delete(src)
+
+        throw error
+
+    })
+
+    slideLoadCache.set(src, slidePromise)
+
+    return slidePromise
+
+}
+
+const preloadIndexes = (indexes) => {
+
+    indexes.forEach((index) => {
+
+        preloadSlide(slides[normalizeSlideIndex(index)]).catch(() => undefined)
+
+    })
+
+}
+
 function PresentationPage() {
 
     const [currentSlide, setCurrentSlide] = useState(0)
+    const [pendingSlide, setPendingSlide] = useState(null)
     const [touchStart, setTouchStart] = useState(0)
     const [isFullscreen, setIsFullscreen] = useState(false)
-    const nextSlide = () => {
+    const navigationRequestRef = useRef(0)
 
-        setCurrentSlide((prev) => (prev + 1) % slides.length)
+    const goToSlide = useCallback((index) => {
 
-    }
+        const targetSlide = normalizeSlideIndex(index)
+        const requestId = navigationRequestRef.current + 1
 
-    const prevSlide = () => {
+        navigationRequestRef.current = requestId
 
-        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+        if (targetSlide === currentSlide) {
 
-    }
+            setPendingSlide(null)
+
+            return
+
+        }
+
+        setPendingSlide(targetSlide)
+
+        preloadSlide(slides[targetSlide])
+            .then(() => {
+
+                if (navigationRequestRef.current === requestId) {
+
+                    setCurrentSlide(targetSlide)
+                    setPendingSlide(null)
+
+                }
+
+            })
+            .catch(() => {
+
+                if (navigationRequestRef.current === requestId) {
+
+                    setCurrentSlide(targetSlide)
+                    setPendingSlide(null)
+
+                }
+
+            })
+
+    }, [currentSlide])
+
+    const nextSlide = useCallback(() => {
+
+        goToSlide((pendingSlide ?? currentSlide) + 1)
+
+    }, [currentSlide, goToSlide, pendingSlide])
+
+    const prevSlide = useCallback(() => {
+
+        goToSlide((pendingSlide ?? currentSlide) - 1)
+
+    }, [currentSlide, goToSlide, pendingSlide])
+
     const openFullscreen = () => {
         setIsFullscreen(true)
     }
@@ -59,7 +180,7 @@ function PresentationPage() {
     }
     useEffect(() => {
 
-        const preloadIndexes = [
+        preloadIndexes([
 
             (currentSlide + 1) % slides.length,
 
@@ -69,17 +190,65 @@ function PresentationPage() {
 
             (currentSlide - 2 + slides.length) % slides.length,
 
-        ]
-
-        preloadIndexes.forEach(index => {
-
-            const img = new Image()
-
-            img.src = slides[index]
-
-        })
+        ])
 
     }, [currentSlide])
+
+    useEffect(() => {
+
+        let isCancelled = false
+        let idleCallbackId = null
+        let timeoutId = null
+
+        const warmSlidesCache = async () => {
+
+            const priorityIndexes = [0, 1, 2, slides.length - 1]
+
+            preloadIndexes(priorityIndexes)
+
+            for (let index = 0; index < slides.length; index += 1) {
+
+                if (isCancelled) {
+
+                    return
+
+                }
+
+                await preloadSlide(slides[index]).catch(() => undefined)
+
+            }
+
+        }
+
+        if ('requestIdleCallback' in window) {
+
+            idleCallbackId = window.requestIdleCallback(warmSlidesCache, { timeout: 2000 })
+
+        } else {
+
+            timeoutId = window.setTimeout(warmSlidesCache, 1000)
+
+        }
+
+        return () => {
+
+            isCancelled = true
+
+            if (idleCallbackId !== null) {
+
+                window.cancelIdleCallback(idleCallbackId)
+
+            }
+
+            if (timeoutId !== null) {
+
+                window.clearTimeout(timeoutId)
+
+            }
+
+        }
+
+    }, [])
 
     useEffect(() => {
 
@@ -107,7 +276,7 @@ function PresentationPage() {
 
         }
 
-    }, [])
+    }, [nextSlide, prevSlide])
     return (
         <main className="presentationPage">
             <section className="presentationWrapper">
@@ -131,7 +300,17 @@ function PresentationPage() {
                         className="slideImage"
                         src={slides[currentSlide]}
                         alt={`Слайд ${currentSlide + 1}`}
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
                     />
+
+                    {pendingSlide !== null && (
+                        <div className="slideLoading" role="status" aria-live="polite">
+                            <span className="slideLoaderIcon" aria-hidden="true" />
+                            <span className="visuallyHidden">Загрузка слайда</span>
+                        </div>
+                    )}
 
                     <button className="arrow arrowRight" onClick={nextSlide}>
                         ›
@@ -168,7 +347,17 @@ function PresentationPage() {
                         className="fullscreenSlideImage"
                         src={slides[currentSlide]}
                         alt={`Слайд ${currentSlide + 1}`}
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
                     />
+
+                    {pendingSlide !== null && (
+                        <div className="slideLoading fullscreenLoading" role="status" aria-live="polite">
+                            <span className="slideLoaderIcon" aria-hidden="true" />
+                            <span className="visuallyHidden">Загрузка слайда</span>
+                        </div>
+                    )}
 
                     <button className="arrow arrowRight" onClick={nextSlide}>
                         ›

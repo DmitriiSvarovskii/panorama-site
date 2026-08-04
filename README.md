@@ -69,18 +69,22 @@ server {
     index index.html;
 
     location / {
+        add_header Cache-Control "no-cache";
         try_files $uri $uri/ /index.html;
     }
 
     location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
         try_files $uri =404;
     }
 
     location /slides-webp/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
         try_files $uri =404;
     }
 
     location /files/ {
+        add_header Cache-Control "public, max-age=86400";
         try_files $uri =404;
     }
 }
